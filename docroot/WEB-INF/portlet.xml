@@ -4,10 +4,10 @@
 	<portlet>
 		<portlet-name>ic2-actualiza-info-colciencias</portlet-name>
 		<display-name>ic2-actualiza-info-colciencias</display-name>
-		<portlet-class>com.liferay.util.bridges.mvc.MVCPortlet</portlet-class>
+		<portlet-class>co.com.ic2.actualizaInfo.portlet.ActualizaInfoPortlet</portlet-class>
 		<init-param>
 			<name>view-template</name>
-			<value>/view.jsp</value>
+			<value>/html/actualiza_info/view.jsp</value>
 		</init-param>
 		<expiration-cache>0</expiration-cache>
 		<supports>
@@ -17,6 +17,36 @@
 			<title>ic2-actualiza-info-colciencias</title>
 			<short-title>ic2-actualiza-info-colciencias</short-title>
 			<keywords>ic2-actualiza-info-colciencias</keywords>
+		</portlet-info>
+		<security-role-ref>
+			<role-name>administrator</role-name>
+		</security-role-ref>
+		<security-role-ref>
+			<role-name>guest</role-name>
+		</security-role-ref>
+		<security-role-ref>
+			<role-name>power-user</role-name>
+		</security-role-ref>
+		<security-role-ref>
+			<role-name>user</role-name>
+		</security-role-ref>
+	</portlet>
+	<portlet>
+		<portlet-name>ic2-preferencias-recomendacion</portlet-name>
+		<display-name>ic2-preferencias-recomendacion</display-name>
+		<portlet-class>co.com.ic2.actualizaInfo.portlet.PreferenciasRecomendacionPortlet</portlet-class>
+		<init-param>
+			<name>view-template</name>
+			<value>/html/preferencias_recomendacion/view.jsp</value>
+		</init-param>
+		<expiration-cache>0</expiration-cache>
+		<supports>
+			<mime-type>text/html</mime-type>
+		</supports>
+		<portlet-info>
+			<title>ic2-preferencias-recomendacion</title>
+			<short-title>ic2-preferencias-recomendacion</short-title>
+			<keywords>ic2-preferencias-recomendacion</keywords>
 		</portlet-info>
 		<security-role-ref>
 			<role-name>administrator</role-name>
