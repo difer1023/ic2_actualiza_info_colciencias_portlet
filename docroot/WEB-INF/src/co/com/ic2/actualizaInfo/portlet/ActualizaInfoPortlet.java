@@ -58,6 +58,8 @@ import com.liferay.portal.util.PortalUtil;
 
 public class ActualizaInfoPortlet extends GenericPortlet {
 
+	private static Log _log = LogFactoryUtil.getLog(ActualizaInfoPortlet.class);
+	
 	public void init() {
 		viewTemplate = getInitParameter("view-template");
 	}
@@ -88,11 +90,11 @@ public class ActualizaInfoPortlet extends GenericPortlet {
 	public void obtenerInformacionPrivada(ActionRequest actionRequest,
 			ActionResponse actionResponse) throws IOException, PortletException {
 
-		System.out.println(actionRequest.getParameter("nacionalidad"));
-		System.out.println(actionRequest.getParameter("paisNacimiento"));
-		System.out.println(actionRequest.getParameter("nombre"));
-		System.out.println(actionRequest.getParameter("numeroDocumento"));
-		System.out.println(actionRequest.getParameter("contrasena"));
+		_log.info(actionRequest.getParameter("nacionalidad"));
+		_log.info(actionRequest.getParameter("paisNacimiento"));
+		_log.info(actionRequest.getParameter("nombre"));
+		_log.info(actionRequest.getParameter("numeroDocumento"));
+		_log.info(actionRequest.getParameter("contrasena"));
 
 		ParametrosProperties.getInstance().limpiarParametros();
 		
@@ -108,7 +110,7 @@ public class ActualizaInfoPortlet extends GenericPortlet {
 		
 		ExtraerGrupoInvestigacionObject response= scraperPrivado
 				.extraerGrupoInvestigacion(tipoNacionalidad, paisNacimiento,
-						nombre, identificacion, contrasena,0);
+						nombre, identificacion, contrasena,0,2016);
 		HttpServletRequest request = PortalUtil
 				.getHttpServletRequest(actionRequest);
 		if(response.getRespuesta()==0){
@@ -190,7 +192,7 @@ public class ActualizaInfoPortlet extends GenericPortlet {
 		
 		ExtraerGrupoInvestigacionObject response= scraperPrivado
 				.extraerGrupoInvestigacion(tipoNacionalidad, paisNacimiento,
-						nombre, identificacion, contrasena,Integer.parseInt(grupo));
+						nombre, identificacion, contrasena,Integer.parseInt(grupo),2016);
 		
 		System.out.println("seleccion grupo "+response.getGrupoInvestigacion().getArticulosInvestigacion().size());
 		
@@ -206,7 +208,7 @@ public class ActualizaInfoPortlet extends GenericPortlet {
 		HttpServletRequest request = PortalUtil
 				.getHttpServletRequest(renderRequest);
 		String vista = (String) request.getAttribute("view");
-
+		_log.info("vista:"+ vista);
 		if (vista != null) {
 			include(vista, renderRequest, renderResponse);
 		} else {
@@ -228,10 +230,10 @@ public class ActualizaInfoPortlet extends GenericPortlet {
 	}
 
 	protected String viewTemplate;
-
-	private static Log _log = LogFactoryUtil.getLog(ActualizaInfoPortlet.class);
 	
 	public void almacenarDatosGrupo(GrupoInvestigacion grupoInvestigacion){
+		
+		_log.info(new Gson().toJson(grupoInvestigacion));
 		
 		GrupoInvestigacionFacade grupoInvestigacionFacade = new GrupoInvestigacionFacade();
 		InvestigadorFacade investigadorFacade = new InvestigadorFacade();
@@ -271,35 +273,35 @@ public class ActualizaInfoPortlet extends GenericPortlet {
 		investigadorFacade.insertarInvestigadores(codigoGrupo, grupoInvestigacion.getIntegrantes());
 		
 		try {
-			apoyoProgramaFormacionFacade.insertarApoyosProgramaFormacion(codigoGrupo, grupoInvestigacion.getApoyoProgramaFormacion());
-			articuloInvestigacionFacade.insertarArticulosInvestigacion(codigoGrupo, grupoInvestigacion.getArticulosInvestigacion());
-			asesoriaProgramaOndasFacade.insertarAsesoriasProgramaOndas(codigoGrupo, grupoInvestigacion.getAsesoriaProgramaOndas());
-			capituloLibroFacade.insertarCapitulosLibroInvestigacion(codigoGrupo, grupoInvestigacion.getCapituloDeLibro());
-			consultoriaFacade.insertarConsultorias(codigoGrupo, grupoInvestigacion.getConsultoria());
-			disenoIndustrialFacade.insertarDisenosIndustriales(codigoGrupo, grupoInvestigacion.getDisenoIndustrial());
-			documentoTrabajoFacade.insertarDocumentosTrabajo(codigoGrupo, grupoInvestigacion.getDocumentoTrabajo());
-			edicionFacade.insertarEdiciones(codigoGrupo, grupoInvestigacion.getEdicion());
-			empresaBaseTecnologicaFacade.insertarEmpresasBaseTecnologica(codigoGrupo, grupoInvestigacion.getEmpresaBaseTecnologica());
-			espacioParticipacionCiudadanaFacade.insertarParticipacionesCiudadanasProyectosCTI(codigoGrupo, grupoInvestigacion.getEspacioParticipacionCiudadana());
-			esquemaCircuitoFacade.insertarEsquemasCircuito(codigoGrupo, grupoInvestigacion.getEsquemaCircuito());
-			estrategiaComunicacionFacade.insertarEstrategiasComunicacionConocimiento(codigoGrupo, grupoInvestigacion.getEstrategiaComunicacionConocimiento());
-			estrategiaPedagogicaFacade.insertarEstrategiasPedagogicasFomentoCTI(codigoGrupo,grupoInvestigacion.getEstrategiaPedagogicaFomentoCTI());
-			eventoCientificoFacade.insertarEventosCientificos(codigoGrupo, grupoInvestigacion.getEventoCientifico());
-			generacionContenidoFacade.insertarGeneracionContenidosMultimedia(codigoGrupo, grupoInvestigacion.getGeneracionContenidoMultimedia());
-			generacionContenidoFacade.insertarGeneracionContenidosVirtuales(codigoGrupo, grupoInvestigacion.getGeneracionContenidoVirtual());
-			generacionContenidoFacade.insertarGeneracionContenidosImpresos(codigoGrupo, grupoInvestigacion.getGeneracionContenidoImpreso());
-			informeFinalFacade.insertarInformesFinalesInvestigacion(codigoGrupo, grupoInvestigacion.getInformeInvestigacion());
-			innovacionFacade.insertarInnovacionesProcedimientosServicios(codigoGrupo, grupoInvestigacion.getInnovacionProceso());
-			libroFacade.insertarLibrosInvestigacion(codigoGrupo, grupoInvestigacion.getLibrosResultadoInvestigacion());
-			participacionCiudadanaProyectoCTIFacade.insertarParticipacionesCiudadanasProyectosCTI(codigoGrupo, grupoInvestigacion.getParticipacionCiudadanaProyectoCTI());
-			plantaPilotoFacade.insertarPlantasPilotos(codigoGrupo, grupoInvestigacion.getPlantaPiloto());
-			prototipoIndustrialFacade.insertarPrototiposIndustriales(codigoGrupo, grupoInvestigacion.getPrototipo());
-			//proyectoExtensionFacade.insertarProyectosExtensionCTI(codigoGrupo, grupoInvestigacion.getp)
-			proyectoFacade.insertarProyectos(codigoGrupo, grupoInvestigacion.getProyecto());
-			redConocimientoFacade.insertarRedesConocimiento(codigoGrupo, grupoInvestigacion.getRedConocimiento());
-			signoDistintivoFacade.insertarSignoDistintivos(codigoGrupo, grupoInvestigacion.getSignoDistintivo());
-			softwareFacade.insertarSoftwares(codigoGrupo, grupoInvestigacion.getSoftware());
-			trabajoGradoFacade.insertarTrabajosGrado(codigoGrupo, grupoInvestigacion.getTrabajoDirigido());
+			if(!grupoInvestigacion.getApoyoProgramaFormacion().isEmpty()){apoyoProgramaFormacionFacade.insertarApoyosProgramaFormacion(codigoGrupo, grupoInvestigacion.getApoyoProgramaFormacion());}
+			if(!grupoInvestigacion.getArticulosInvestigacion().isEmpty()){articuloInvestigacionFacade.insertarArticulosInvestigacion(codigoGrupo, grupoInvestigacion.getArticulosInvestigacion());}
+			if(!grupoInvestigacion.getAsesoriaProgramaOndas().isEmpty()){asesoriaProgramaOndasFacade.insertarAsesoriasProgramaOndas(codigoGrupo, grupoInvestigacion.getAsesoriaProgramaOndas());}
+			if(!grupoInvestigacion.getCapituloDeLibro().isEmpty()){capituloLibroFacade.insertarCapitulosLibroInvestigacion(codigoGrupo, grupoInvestigacion.getCapituloDeLibro());}
+			if(!grupoInvestigacion.getConsultoria().isEmpty()){consultoriaFacade.insertarConsultorias(codigoGrupo, grupoInvestigacion.getConsultoria());}
+			if(!grupoInvestigacion.getDisenoIndustrial().isEmpty()){disenoIndustrialFacade.insertarDisenosIndustriales(codigoGrupo, grupoInvestigacion.getDisenoIndustrial());}
+			if(!grupoInvestigacion.getDocumentoTrabajo().isEmpty()){documentoTrabajoFacade.insertarDocumentosTrabajo(codigoGrupo, grupoInvestigacion.getDocumentoTrabajo());}
+			if(!grupoInvestigacion.getEdicion().isEmpty()){edicionFacade.insertarEdiciones(codigoGrupo, grupoInvestigacion.getEdicion());}
+			if(!grupoInvestigacion.getEmpresaBaseTecnologica().isEmpty()){empresaBaseTecnologicaFacade.insertarEmpresasBaseTecnologica(codigoGrupo, grupoInvestigacion.getEmpresaBaseTecnologica());}
+			if(!grupoInvestigacion.getEspacioParticipacionCiudadana().isEmpty()){espacioParticipacionCiudadanaFacade.insertarParticipacionesCiudadanasProyectosCTI(codigoGrupo, grupoInvestigacion.getEspacioParticipacionCiudadana());}
+			if(!grupoInvestigacion.getEsquemaCircuito().isEmpty()){esquemaCircuitoFacade.insertarEsquemasCircuito(codigoGrupo, grupoInvestigacion.getEsquemaCircuito());}
+			if(!grupoInvestigacion.getEstrategiaComunicacionConocimiento().isEmpty()){estrategiaComunicacionFacade.insertarEstrategiasComunicacionConocimiento(codigoGrupo, grupoInvestigacion.getEstrategiaComunicacionConocimiento());}
+			if(!grupoInvestigacion.getEstrategiaPedagogicaFomentoCTI().isEmpty()){estrategiaPedagogicaFacade.insertarEstrategiasPedagogicasFomentoCTI(codigoGrupo,grupoInvestigacion.getEstrategiaPedagogicaFomentoCTI());}
+			if(!grupoInvestigacion.getEventoCientifico().isEmpty()){eventoCientificoFacade.insertarEventosCientificos(codigoGrupo, grupoInvestigacion.getEventoCientifico());}
+			if(!grupoInvestigacion.getGeneracionContenidoMultimedia().isEmpty()){generacionContenidoFacade.insertarGeneracionContenidosMultimedia(codigoGrupo, grupoInvestigacion.getGeneracionContenidoMultimedia());}
+			if(!grupoInvestigacion.getGeneracionContenidoVirtual().isEmpty()){generacionContenidoFacade.insertarGeneracionContenidosVirtuales(codigoGrupo, grupoInvestigacion.getGeneracionContenidoVirtual());}
+			if(!grupoInvestigacion.getGeneracionContenidoImpreso().isEmpty()){generacionContenidoFacade.insertarGeneracionContenidosImpresos(codigoGrupo, grupoInvestigacion.getGeneracionContenidoImpreso());}
+			if(!grupoInvestigacion.getInformeInvestigacion().isEmpty()){informeFinalFacade.insertarInformesFinalesInvestigacion(codigoGrupo, grupoInvestigacion.getInformeInvestigacion());}
+			if(!grupoInvestigacion.getInnovacionProceso().isEmpty()){innovacionFacade.insertarInnovacionesProcedimientosServicios(codigoGrupo, grupoInvestigacion.getInnovacionProceso());}
+			if(!grupoInvestigacion.getLibrosResultadoInvestigacion().isEmpty()){libroFacade.insertarLibrosInvestigacion(codigoGrupo, grupoInvestigacion.getLibrosResultadoInvestigacion());}
+			if(!grupoInvestigacion.getParticipacionCiudadanaProyectoCTI().isEmpty()){participacionCiudadanaProyectoCTIFacade.insertarParticipacionesCiudadanasProyectosCTI(codigoGrupo, grupoInvestigacion.getParticipacionCiudadanaProyectoCTI());}
+			if(!grupoInvestigacion.getPlantaPiloto().isEmpty()){plantaPilotoFacade.insertarPlantasPilotos(codigoGrupo, grupoInvestigacion.getPlantaPiloto());}
+			if(!grupoInvestigacion.getPrototipo().isEmpty()){prototipoIndustrialFacade.insertarPrototiposIndustriales(codigoGrupo, grupoInvestigacion.getPrototipo());}
+			//if(!grupoInvestigacion.getApoyoProgramaFormacion().isEmpty()){proyectoExtensionFacade.insertarProyectosExtensionCTI(codigoGrupo, grupoInvestigacion.getp)}
+			if(!grupoInvestigacion.getProyecto().isEmpty()){proyectoFacade.insertarProyectos(codigoGrupo, grupoInvestigacion.getProyecto());}
+			if(!grupoInvestigacion.getRedConocimiento().isEmpty()){redConocimientoFacade.insertarRedesConocimiento(codigoGrupo, grupoInvestigacion.getRedConocimiento());}
+			if(!grupoInvestigacion.getSignoDistintivo().isEmpty()){signoDistintivoFacade.insertarSignoDistintivos(codigoGrupo, grupoInvestigacion.getSignoDistintivo());}
+			if(!grupoInvestigacion.getSoftware().isEmpty()){softwareFacade.insertarSoftwares(codigoGrupo, grupoInvestigacion.getSoftware());}
+			if(!grupoInvestigacion.getTrabajoDirigido().isEmpty()){trabajoGradoFacade.insertarTrabajosGrado(codigoGrupo, grupoInvestigacion.getTrabajoDirigido());}
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
