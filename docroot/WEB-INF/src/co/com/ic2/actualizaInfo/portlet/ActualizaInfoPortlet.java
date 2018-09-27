@@ -268,7 +268,7 @@ public class ActualizaInfoPortlet extends GenericPortlet {
 		SoftwareFacade softwareFacade = new SoftwareFacade();
 		TrabajoGradoFacade trabajoGradoFacade = new TrabajoGradoFacade();
 		
-		String codigoGrupo=String.valueOf(grupoInvestigacionFacade.insertarGrupoInvestigacion(grupoInvestigacion.getNombre()));
+		String codigoGrupo=String.valueOf(grupoInvestigacionFacade.insertarGrupoInvestigacion(grupoInvestigacion));
 		
 		investigadorFacade.insertarInvestigadores(codigoGrupo, grupoInvestigacion.getIntegrantes());
 		
