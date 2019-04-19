@@ -13,6 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 
 public class PreferenciasRecomendacionPortlet extends GenericPortlet {
@@ -24,11 +27,9 @@ public class PreferenciasRecomendacionPortlet extends GenericPortlet {
     public void processAction(
             ActionRequest actionRequest, ActionResponse actionResponse)
         throws IOException, PortletException {
-    	System.out.println("processAction");
-//        super.processAction(actionRequest, actionResponse);
-    	HttpServletRequest request=PortalUtil.getHttpServletRequest(actionRequest);
+    	ThemeDisplay themeDisplay=(ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
     	
-//    	request.setAttribute("view", "/html/actualiza_info/privado/informacion_gruplac.jsp");
+    	themeDisplay.getUser().getExpandoBridge().setAttribute("clasificacionObjetivo", ParamUtil.getString(actionRequest,"selectorCategoria"));
     }
 
     public void doView(
