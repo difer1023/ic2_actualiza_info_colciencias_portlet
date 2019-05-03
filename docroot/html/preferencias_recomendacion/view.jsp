@@ -11,22 +11,22 @@ String clasificacionObjetivo=(String) user.getExpandoBridge().getAttribute("clas
 	<div class="col-md-4 col-centered">
 		<div class="box box-solid">
 			<div class="box-header with-border">
-				<h3 class="box-title">Seleccion de objetivo</h3>
+				<h3 class="box-title">Selección de objetivo</h3>
 			</div>
 			<!-- /.box-header -->
 			<div class="box-body">
-				<p>En este modulo, podra seleccionar la clasificacion que desea
-					alcanzar para la proxima convocatoria de medicion de grupos de
-					investigacion</p>
+				<p>En este modulo, podrá seleccionar la clasificación que desea
+					alcanzar para la próxima convocatoria de medición de grupos de
+					investigación</p>
 
 				<form id="formularioSelecccion" action="<%=actionForm%>"
 					method="POST">
-					<label>Clasificacion objetivo</label> <select
+					<label>Clasificación objetivo</label> <select
 						name="<portlet:namespace/>selectorCategoria" id="selectorCategoria">
-						<option value="A1">Categor&#237;a A1</option>
-						<option value="A">Categor&#237;a A</option>
-						<option value="B">Categor&#237;a B</option>
-						<option value="C">Categor&#237;a C</option>
+						<option value="A1">Categoría A1</option>
+						<option value="A">Categoría A</option>
+						<option value="B">Categoría B</option>
+						<option value="C">Categoría C</option>
 					</select> 
 					<input type="submit" class="btn btn-block btn-primary btn-sm" value="Continuar">
 				</form>

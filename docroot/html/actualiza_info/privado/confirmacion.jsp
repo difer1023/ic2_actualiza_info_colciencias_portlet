@@ -3,16 +3,16 @@
 <div class="col-md-4 col-centered">
           <div class="box box-solid">
             <div class="box-header with-border">
-              <h3 class="box-title">Extracion exitosa!</h3>
+              <h3 class="box-title">Extracción exitosa!</h3>
             </div>
             <!-- /.box-header -->
             <div class="box-body">
-            	<p>Se ha extraido correctamente la informacion del aplicativo Gruplac, ahora puede continuar con la asignacion de la meta de su grupo de investigacion.</p>
+            	<p>Se ha extraído correctamente la información del aplicativo Gruplac, ahora puede continuar con la asignación de la clasificacíon objetivo de su grupo de investigación.</p>
 				
             </div>
             <!-- /.box-body -->
             <div class="box-footer">
-            	<a class="btn btn-success" href="/group/user/selecion-de-objetivo">Definir mi objetivo</a>
+            	<a class="btn btn-success" href="/group/user/seleccion-de-objetivo">Definir mi objetivo</a>
             </div>
           </div>
           <!-- /.box -->

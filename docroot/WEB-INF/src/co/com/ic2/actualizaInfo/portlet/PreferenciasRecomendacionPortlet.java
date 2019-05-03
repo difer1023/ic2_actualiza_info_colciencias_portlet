@@ -11,6 +11,10 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import co.com.ic2.colciencias.utilidades.usuario.UsuarioUtil;
+
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -28,8 +32,18 @@ public class PreferenciasRecomendacionPortlet extends GenericPortlet {
             ActionRequest actionRequest, ActionResponse actionResponse)
         throws IOException, PortletException {
     	ThemeDisplay themeDisplay=(ThemeDisplay) actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
-    	
+    	Boolean redirect=themeDisplay.getUser().getExpandoBridge().getAttribute("clasificacionObjetivo")==null || themeDisplay.getUser().getExpandoBridge().getAttribute("clasificacionObjetivo").equals("");
     	themeDisplay.getUser().getExpandoBridge().setAttribute("clasificacionObjetivo", ParamUtil.getString(actionRequest,"selectorCategoria"));
+    	themeDisplay.getUser().getExpandoBridge().setAttribute("recomendacion","");
+		try {
+			UsuarioUtil.INSTANCE.asignarRol(PortalUtil.getUser(actionRequest).getCompanyId(),PortalUtil.getUser(actionRequest).getUserId(),"Recomendacion");
+		} catch (PortalException | SystemException e) {
+			LOG.error("Error asignando rol en preferenciasRecomendacion");
+			e.printStackTrace();
+		}
+		if(redirect){
+			actionResponse.sendRedirect("/group/user/recomendacion");
+		}
     }
 
     public void doView(
@@ -55,7 +69,7 @@ public class PreferenciasRecomendacionPortlet extends GenericPortlet {
             getPortletContext().getRequestDispatcher(path);
 
         if (portletRequestDispatcher == null) {
-            _log.error(path + " is not a valid include");
+            LOG.error(path + " is not a valid include");
         }
         else {
             portletRequestDispatcher.include(renderRequest, renderResponse);
@@ -64,6 +78,6 @@ public class PreferenciasRecomendacionPortlet extends GenericPortlet {
  
     protected String viewTemplate;
 
-    private static Log _log = LogFactoryUtil.getLog(PreferenciasRecomendacionPortlet.class);
+    private static Log LOG = LogFactoryUtil.getLog(PreferenciasRecomendacionPortlet.class);
 
 }

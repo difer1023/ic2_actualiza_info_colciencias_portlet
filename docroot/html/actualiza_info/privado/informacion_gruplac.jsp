@@ -5,8 +5,8 @@
 	<div class="col-md-6 col-centered">
 		<div class="box box-solid">
 
-			<form id="formularioRegistro" action="<%=actionForm%>" method="POST" class="form-horizontal">
-				<div class="box-body">
+			<div class="box-body">
+				<form id="formularioRegistro" action="<%=actionForm%>" method="POST" class="form-horizontal">
 					<div class="form-group">
 						<label for="nacionalidad" class="col-sm-2 control-label">Nacionalidad</label>
 						<div class="col-sm-10">
@@ -308,12 +308,20 @@
 						</div>
 					</div>
 					<div class="box-footer">
-						<input type="submit" value="Enviar" class="btn btn-info pull-right">
+						<input type="submit" value="Enviar" class="btn btn-info pull-right" onclick="mostrarLoader()">
 					</div>
-				</div>
-				<!-- /.box-body -->
-			</form>
+				</form>
+			</div>
+			<!-- /.box-body -->
+			<div class="overlay hide" id="loader">
+              <i class="fa fa-spinner fa-spin"></i>
+           	</div>
 		</div>
 		<!-- /.box -->
 	</div>
 </div>
+<script type="text/javascript">
+function mostrarLoader(){
+	document.getElementById("loader").classList.remove("hide");
+}
+</script>
