@@ -1,6 +1,7 @@
 package co.com.ic2.actualizaInfo.portlet;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import co.com.ic2.colciencias.gruplac.ClasificacionGrupo;
 import co.com.ic2.colciencias.gruplac.GrupoInvestigacion;
+import co.com.ic2.colciencias.gruplac.ProductoInvestigacion;
 import co.com.ic2.colciencias.service.scraper.ExtraerGrupoInvestigacionResponse;
 import co.com.ic2.colciencias.utilidades.properties.ParametrosProperties;
 import co.com.ic2.colciencias.utilidades.usuario.UsuarioUtil;
@@ -24,8 +26,11 @@ import co.com.ic2.facade.ScraperColcienciasFacade;
 import com.google.gson.Gson;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.model.User;
 import com.liferay.portal.util.PortalUtil;
 
@@ -71,7 +76,10 @@ public class ActualizaInfoPortlet extends GenericPortlet {
 		
 		ExtraerGrupoInvestigacionResponse response= scraperPrivado
 				.extraerGrupoInvestigacionPrivado(tipoNacionalidad, paisNacimiento,
-						nombre, identificacion, contrasena,0,2016);
+						nombre, identificacion, contrasena,0,Integer
+						.parseInt(ParametrosProperties.getInstance()
+								.getPropiedadesPortal()
+								.getProperty("anoFinVentanaObservacion")));
 		HttpServletRequest request = PortalUtil
 				.getHttpServletRequest(actionRequest);
 		if(response.getRespuesta()==0){
@@ -79,20 +87,34 @@ public class ActualizaInfoPortlet extends GenericPortlet {
 			LOG.info(new Gson().toJson(grupoInvestigacion));
 
 			try {
-				almacenarDatosGrupo(grupoInvestigacion,PortalUtil.getUser(actionRequest));
+				almacenarDatosGrupo(grupoInvestigacion,PortalUtil.getUser(actionRequest),actionRequest);
 				
-				int anoFinVentanaObservacion=Integer.parseInt(ParametrosProperties.getInstance().getPropiedadesPortal().getProperty("anoFinVentanaObservacion"));
-		        
-		        ClasificacionGrupo clasificacionGrupo=
-		        		new GrupoInvestigacionFacade().consultarGruposInvestigacion(Integer.parseInt((String) PortalUtil.getUser(actionRequest).getExpandoBridge().getAttribute("codigoGrupo")),
-		   			 anoFinVentanaObservacion);
-		        request.getSession(false).setAttribute("clasificacionGrupoInvestigacion", clasificacionGrupo);
 				
 				UsuarioUtil.INSTANCE.asignarRol(PortalUtil.getUser(actionRequest).getCompanyId(),PortalUtil.getUser(actionRequest).getUserId(),"SeleccionObjetivo");
-				request.setAttribute("view",
+				
+				GrupoInvestigacionFacade grupoInvestigacionFacade = new GrupoInvestigacionFacade();
+				JSONArray productosSinClasificacion=JSONFactoryUtil.createJSONArray(grupoInvestigacionFacade.consultarProductosSinClasificacion(Integer.parseInt((String)PortalUtil.getUser(actionRequest).getExpandoBridge().getAttribute("codigoGrupo"))));
+				
+				if(productosSinClasificacion.length()>0){
+					
+					request.setAttribute("categorias",grupoInvestigacionFacade.consultarTiposProductosInvestigacion());
+					request.setAttribute("productosNoClasificados",productosSinClasificacion);
+					request.setAttribute("view",
+							"/html/actualiza_info/privado/clasificacion_productos.jsp");
+				}else{
+					int anoFinVentanaObservacion=Integer.parseInt(ParametrosProperties.getInstance().getPropiedadesPortal().getProperty("anoFinVentanaObservacion"));
+					
+					ClasificacionGrupo clasificacionGrupo=
+							new GrupoInvestigacionFacade().consultarGruposInvestigacion(Integer.parseInt((String) PortalUtil.getUser(actionRequest).getExpandoBridge().getAttribute("codigoGrupo")),
+									anoFinVentanaObservacion);
+					request.getSession(false).setAttribute("clasificacionGrupoInvestigacion", clasificacionGrupo);
+					
+					request.setAttribute("view",
 						"/html/actualiza_info/privado/confirmacion.jsp");
+				}
+				
+				
 			} catch (PortalException | SystemException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
@@ -134,29 +156,83 @@ public class ActualizaInfoPortlet extends GenericPortlet {
 		
 		ExtraerGrupoInvestigacionResponse response= scraperPrivado
 				.extraerGrupoInvestigacionPrivado(tipoNacionalidad, paisNacimiento,
-						nombre, identificacion, contrasena,Integer.parseInt(grupo),2016);
+						nombre, identificacion, contrasena,Integer.parseInt(grupo),Integer
+						.parseInt(ParametrosProperties.getInstance()
+								.getPropiedadesPortal()
+								.getProperty("anoFinVentanaObservacion")));
 		
 		LOG.info("seleccion grupo "+response.getGrupoInvestigacion().getProductosInvestigacion().getProductoInvestigacion().size());
 		
 		try {
-			almacenarDatosGrupo(response.getGrupoInvestigacion(),PortalUtil.getUser(actionRequest));
+			
+			almacenarDatosGrupo(response.getGrupoInvestigacion(),PortalUtil.getUser(actionRequest),actionRequest);
 	        
-	        int anoFinVentanaObservacion=Integer.parseInt(ParametrosProperties.getInstance().getPropiedadesPortal().getProperty("anoFinVentanaObservacion"));
-	        
-	        ClasificacionGrupo clasificacionGrupo=
-	        		new GrupoInvestigacionFacade().consultarGruposInvestigacion(Integer.parseInt((String) PortalUtil.getUser(actionRequest).getExpandoBridge().getAttribute("codigoGrupo")),
-	   			 anoFinVentanaObservacion);
-	        request.getSession(false).setAttribute("clasificacionGrupoInvestigacion", clasificacionGrupo);
 			
 			UsuarioUtil.INSTANCE.asignarRol(PortalUtil.getUser(actionRequest).getCompanyId(),PortalUtil.getUser(actionRequest).getUserId(),"SeleccionObjetivo");
+			
+			GrupoInvestigacionFacade grupoInvestigacionFacade = new GrupoInvestigacionFacade();
+			JSONArray productosSinClasificacion=JSONFactoryUtil.createJSONArray(grupoInvestigacionFacade.consultarProductosSinClasificacion(Integer.parseInt((String)PortalUtil.getUser(actionRequest).getExpandoBridge().getAttribute("codigoGrupo"))));
+			
+			if(productosSinClasificacion.length()>0){
+				
+				request.setAttribute("categorias",grupoInvestigacionFacade.consultarTiposProductosInvestigacion());
+				request.setAttribute("productosNoClasificados",productosSinClasificacion);
+				request.setAttribute("view",
+						"/html/actualiza_info/privado/clasificacion_productos.jsp");
+			}else{
+				int anoFinVentanaObservacion=Integer.parseInt(ParametrosProperties.getInstance().getPropiedadesPortal().getProperty("anoFinVentanaObservacion"));
+				
+				ClasificacionGrupo clasificacionGrupo=
+						new GrupoInvestigacionFacade().consultarGruposInvestigacion(Integer.parseInt((String) PortalUtil.getUser(actionRequest).getExpandoBridge().getAttribute("codigoGrupo")),
+								anoFinVentanaObservacion);
+				request.getSession(false).setAttribute("clasificacionGrupoInvestigacion", clasificacionGrupo);
+				request.setAttribute("view",
+					"/html/actualiza_info/privado/confirmacion.jsp");
+			}
 		} catch (PortalException | SystemException e) {
 			e.printStackTrace();
 		}
-		
-		request.setAttribute("view",
-				"/html/actualiza_info/privado/confirmacion.jsp");
 	}
 
+	@ProcessAction(name = "guardarClasificaciones")
+	public void guardarClasificaciones(ActionRequest actionRequest,
+			ActionResponse actionResponse) throws IOException, PortletException {
+		
+		HttpServletRequest request = PortalUtil
+				.getHttpServletRequest(actionRequest);
+		
+		LOG.info("Guardando clasificaciones manuales "+ParamUtil.getString(actionRequest, "clasificaciones"));
+		
+		try {
+			GrupoInvestigacionFacade grupoInvestigacionFacade = new GrupoInvestigacionFacade();
+			JSONArray clasificacionesArray=JSONFactoryUtil.createJSONArray(ParamUtil.getString(actionRequest, "clasificaciones"));
+			if(clasificacionesArray.length()>0){
+				ArrayList<ProductoInvestigacion> clasificaciones=new ArrayList<ProductoInvestigacion>();
+				for(int i=0;i<clasificacionesArray.length();i++){
+					ProductoInvestigacion producto=new ProductoInvestigacion();
+					producto.setCodigo(clasificacionesArray.getJSONObject(i).getInt("k_codigo"));
+					producto.setCategoria(clasificacionesArray.getJSONObject(i).getString("c_categoria"));
+					clasificaciones.add(producto);
+				}
+				grupoInvestigacionFacade.actualizarProductosClasificacionManual(clasificaciones);
+			}
+		
+			int anoFinVentanaObservacion=Integer.parseInt(ParametrosProperties.getInstance().getPropiedadesPortal().getProperty("anoFinVentanaObservacion"));
+			
+			ClasificacionGrupo clasificacionGrupo=
+	        		new GrupoInvestigacionFacade().consultarGruposInvestigacion(Integer.parseInt((String) PortalUtil.getUser(actionRequest).getExpandoBridge().getAttribute("codigoGrupo")),
+	   			 anoFinVentanaObservacion);
+	        request.getSession(false).setAttribute("clasificacionGrupoInvestigacion", clasificacionGrupo);
+	        
+			request.setAttribute("view",
+					"/html/actualiza_info/privado/confirmacion.jsp");
+			
+			
+		} catch (SystemException | PortalException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void doView(RenderRequest renderRequest,
 			RenderResponse renderResponse) throws IOException, PortletException {
 
@@ -186,15 +262,26 @@ public class ActualizaInfoPortlet extends GenericPortlet {
 
 	protected String viewTemplate;
 	
-	public void almacenarDatosGrupo(GrupoInvestigacion grupoInvestigacion,User usuario){
+	public void almacenarDatosGrupo(GrupoInvestigacion grupoInvestigacion,User usuario,ActionRequest request) throws PortalException, SystemException{
 		
 		LOG.info(new Gson().toJson(grupoInvestigacion));
 		
 		GrupoInvestigacionFacade grupoInvestigacionFacade = new GrupoInvestigacionFacade();
 		
-		String codigoGrupo=String.valueOf(grupoInvestigacionFacade.insertarGrupoInvestigacion(grupoInvestigacion));
-		if(codigoGrupo!=null){
-			usuario.getExpandoBridge().setAttribute("codigoGrupo", codigoGrupo);
+		String codigoGrupo=(String) usuario.getExpandoBridge().getAttribute("codigoGrupo");
+		
+		if(codigoGrupo==null || codigoGrupo.equals("")){
+			String codigoGenerado=String.valueOf(grupoInvestigacionFacade.insertarGrupoInvestigacion(grupoInvestigacion));
+			if(codigoGenerado!=null){
+				usuario.getExpandoBridge().setAttribute("codigoGrupo", codigoGenerado);
+			}
+		}else{
+			LOG.info("Actualizando grupo de investigacion");
+			grupoInvestigacionFacade.actualizarGrupoInvestigacion(Integer.parseInt(codigoGrupo),grupoInvestigacion);
+			usuario.getExpandoBridge().setAttribute("recomendacion", "");
+			usuario.getExpandoBridge().setAttribute("clasificacionObjetivo", "");
+			UsuarioUtil.INSTANCE.retirarRol(PortalUtil.getUser(request).getCompanyId(),PortalUtil.getUser(request).getUserId(),"UsuarioGrupo");
+			UsuarioUtil.INSTANCE.retirarRol(PortalUtil.getUser(request).getCompanyId(),PortalUtil.getUser(request).getUserId(),"Recomendacion");
 		}
 	}
 

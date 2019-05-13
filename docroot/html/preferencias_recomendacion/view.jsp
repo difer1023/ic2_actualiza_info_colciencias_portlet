@@ -3,7 +3,7 @@
 <portlet:actionURL var="actionForm"></portlet:actionURL>
 <%
 User usuario=themeDisplay.getUser(); 
-String clasificacionActual=(String) user.getExpandoBridge().getAttribute("clasificacionActual");
+String clasificacionActual=(String) request.getAttribute("clasificacion");
 String clasificacionObjetivo=(String) user.getExpandoBridge().getAttribute("clasificacionObjetivo");
 %>
 

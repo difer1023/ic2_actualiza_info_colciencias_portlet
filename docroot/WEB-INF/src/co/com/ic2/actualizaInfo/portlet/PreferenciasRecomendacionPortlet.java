@@ -7,10 +7,12 @@ import javax.portlet.ActionResponse;
 import javax.portlet.GenericPortlet;
 import javax.portlet.PortletException;
 import javax.portlet.PortletRequestDispatcher;
+import javax.portlet.PortletSession;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.servlet.http.HttpServletRequest;
 
+import co.com.ic2.colciencias.gruplac.ClasificacionGrupo;
 import co.com.ic2.colciencias.utilidades.usuario.UsuarioUtil;
 
 import com.liferay.portal.kernel.exception.PortalException;
@@ -52,6 +54,11 @@ public class PreferenciasRecomendacionPortlet extends GenericPortlet {
     	
     	HttpServletRequest request=PortalUtil.getHttpServletRequest(renderRequest);
     	String vista=(String)request.getAttribute("view");
+    	
+    	PortletSession portletSession = renderRequest.getPortletSession();
+    	ClasificacionGrupo clasificacionGrupo=(ClasificacionGrupo) portletSession.getAttribute("clasificacionGrupoInvestigacion",PortletSession.APPLICATION_SCOPE);
+    	
+    	renderRequest.setAttribute("clasificacion", clasificacionGrupo.getClasificacionGrupo());
     	
     	if (vista!=null){
     		include(vista, renderRequest, renderResponse);
